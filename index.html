@@ -551,6 +551,56 @@ header {
   background: var(--paper);
 }
 
+/* ── Diagram ── */
+.diagram-box {
+  background: var(--paper);
+  border: 1px solid var(--warm);
+  border-radius: 10px;
+  padding: 14px 12px 10px;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.diagram-title {
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: var(--ink-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  margin-bottom: 10px;
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+.diagram-box svg {
+  display: block;
+  margin: 0 auto;
+  overflow: visible;
+}
+
+.diagram-legend {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 9px;
+  flex-wrap: wrap;
+}
+
+.diag-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.65rem;
+  color: var(--ink-light);
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+.diag-legend-line {
+  width: 22px;
+  height: 2.5px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
 /* ── Source note ── */
 .source-note {
   max-width: 980px;
@@ -599,6 +649,102 @@ header {
     </div>
 
     <div class="card-body">
+
+      <!-- 사두증 다이어그램 -->
+      <div class="diagram-box">
+        <div class="diagram-title">측정 방법 — 두정부(위쪽) 관찰 시 대각선 위치</div>
+        <svg width="260" height="210" viewBox="0 0 260 210" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="headGradPlagio" cx="44%" cy="36%" r="62%">
+              <stop offset="0%" stop-color="#fce8e0"/>
+              <stop offset="55%" stop-color="#f5d0c0"/>
+              <stop offset="100%" stop-color="#e8b8a4"/>
+            </radialGradient>
+            <filter id="headShadow" x="-10%" y="-10%" width="120%" height="120%">
+              <feDropShadow dx="2" dy="3" stdDeviation="5" flood-color="rgba(0,0,0,0.18)"/>
+            </filter>
+          </defs>
+
+          <!-- ── HEAD SHAPE ──
+               Clean egg-shaped head (top-down view) — fully smooth contour.
+               Centre ≈ (112, 108). Slightly wider at posterior (baby head proportions).
+               No visible flattening on contour — asymmetry is shown purely by diagonal lengths.
+          -->
+          <path d="
+            M 112 28
+            C 140 28, 168 42, 182 68
+            C 192 88, 195 115, 188 140
+            C 180 165, 160 183, 130 188
+            C 120 190, 105 190, 95 188
+            C 65 183, 45 165, 37 140
+            C 30 115, 33 88, 43 68
+            C 57 42, 85 28, 112 28 Z
+          " fill="url(#headGradPlagio)" stroke="#d4a890" stroke-width="2" filter="url(#headShadow)"/>
+
+          <!-- ── FACIAL FEATURES (top-down baby face, peeking at the top) ── -->
+          <!-- Eyebrows / closed eyes -->
+          <path d="M 92 50 Q 99 46 106 50"  fill="none" stroke="#8a6a58" stroke-width="1.8" stroke-linecap="round"/>
+          <path d="M 118 50 Q 125 46 132 50" fill="none" stroke="#8a6a58" stroke-width="1.8" stroke-linecap="round"/>
+          <!-- Tiny tuft of hair at top -->
+          <path d="M 108 26 Q 112 18 116 26" fill="#a07060" stroke="#8a5c4a" stroke-width="1" stroke-linecap="round"/>
+
+          <!-- ── EARS (small, placed on the contour) ── -->
+          <!-- Left ear -->
+          <path d="M 37 108 Q 27 110 27 120 Q 27 128 37 128" fill="#f0c8b4" stroke="#d4a890" stroke-width="1.4"/>
+          <!-- Right ear -->
+          <path d="M 187 108 Q 197 110 197 120 Q 197 128 187 128" fill="#f0c8b4" stroke="#d4a890" stroke-width="1.4"/>
+
+          <!-- ── DIRECTION LABELS ── -->
+          <text x="112" y="16" text-anchor="middle" font-size="8.5" fill="#9c8070" font-family="Noto Sans KR, sans-serif">전방 (anterior)</text>
+          <text x="112" y="205" text-anchor="middle" font-size="8.5" fill="#9c8070" font-family="Noto Sans KR, sans-serif">후방 (posterior)</text>
+          <text x="10" y="118" text-anchor="middle" font-size="8" fill="#9c8070" font-family="Noto Sans KR, sans-serif">좌</text>
+          <text x="214" y="118" text-anchor="middle" font-size="8" fill="#9c8070" font-family="Noto Sans KR, sans-serif">우</text>
+
+          <!-- ── DIAGONAL LINES ──
+               4 landmark dots on the egg contour, at ~30° from midline.
+               TL (top-left):     x=80,  y=36    ← left-anterior
+               TR (top-right):    x=144, y=36    ← right-anterior
+               BL (bottom-left):  x=72,  y=182   ← left-posterior
+               BR (bottom-right): x=152, y=182   ← right-posterior
+
+               Diagonal A: TR → BL  (longer)
+               Diagonal B: TL → BR  (shorter — R-post flattening shortens this)
+          -->
+
+          <!-- Diagonal A: right-anterior → left-posterior  (LONGER, teal dashed) -->
+          <line x1="144" y1="38" x2="74" y2="180"
+            stroke="#1a6b6b" stroke-width="2.2" stroke-dasharray="7,4"/>
+
+          <!-- Diagonal B: left-anterior → right-posterior  (SHORTER, rose dashed) -->
+          <line x1="80" y1="38" x2="150" y2="180"
+            stroke="#b04060" stroke-width="2.2" stroke-dasharray="7,4"/>
+
+          <!-- 4 landmark dots (black, like reference) -->
+          <circle cx="144" cy="38"  r="5" fill="#2a2a2a" stroke="white" stroke-width="1.5"/>
+          <circle cx="80"  cy="38"  r="5" fill="#2a2a2a" stroke="white" stroke-width="1.5"/>
+          <circle cx="74"  cy="180" r="5" fill="#2a2a2a" stroke="white" stroke-width="1.5"/>
+          <circle cx="150" cy="180" r="5" fill="#2a2a2a" stroke="white" stroke-width="1.5"/>
+
+          <!-- Labels — right side with leader lines (matching reference image) -->
+          <!-- Diagonal A label -->
+          <line x1="140" y1="90" x2="218" y2="82" stroke="#1a6b6b" stroke-width="1" opacity="0.7"/>
+          <text x="220" y="86" font-size="10" font-weight="700" fill="#1a6b6b" font-family="JetBrains Mono, monospace">Diag A</text>
+
+          <!-- Diagonal B label -->
+          <line x1="138" y1="130" x2="218" y2="140" stroke="#b04060" stroke-width="1" opacity="0.7"/>
+          <text x="220" y="144" font-size="10" font-weight="700" fill="#b04060" font-family="JetBrains Mono, monospace">Diag B</text>
+        </svg>
+        <div class="diagram-legend">
+          <div class="diag-legend-item">
+            <div class="diag-legend-line" style="background: repeating-linear-gradient(90deg,#1a6b6b 0,#1a6b6b 6px,transparent 6px,transparent 10px)"></div>
+            <span>대각선 A — 우전방↔좌후방 (긴 쪽)</span>
+          </div>
+          <div class="diag-legend-item">
+            <div class="diag-legend-line" style="background: repeating-linear-gradient(90deg,#b04060 0,#b04060 6px,transparent 6px,transparent 10px)"></div>
+            <span>대각선 B — 좌전방↔우후방 (짧은 쪽)</span>
+          </div>
+        </div>
+      </div>
 
       <div class="field-group">
         <div class="field-label">
@@ -699,6 +845,106 @@ header {
     </div>
 
     <div class="card-body">
+
+      <!-- 단두증/장두증 다이어그램 -->
+      <div class="diagram-box">
+        <div class="diagram-title">측정 방법 — W (가로폭) · L (전후장) 위치</div>
+        <svg width="260" height="210" viewBox="0 0 260 210" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <marker id="arrowW1" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto">
+              <polygon points="0 0, 7 3.5, 0 7" fill="#7a2d45"/>
+            </marker>
+            <marker id="arrowW2" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto-start-reverse">
+              <polygon points="0 0, 7 3.5, 0 7" fill="#7a2d45"/>
+            </marker>
+            <marker id="arrowL1" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto">
+              <polygon points="0 0, 7 3.5, 0 7" fill="#b07810"/>
+            </marker>
+            <marker id="arrowL2" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto-start-reverse">
+              <polygon points="0 0, 7 3.5, 0 7" fill="#b07810"/>
+            </marker>
+            <radialGradient id="headGradBrachy" cx="44%" cy="36%" r="62%">
+              <stop offset="0%" stop-color="#fce8e0"/>
+              <stop offset="55%" stop-color="#f5d0c0"/>
+              <stop offset="100%" stop-color="#e8b8a4"/>
+            </radialGradient>
+            <filter id="headShadowBrachy" x="-10%" y="-10%" width="120%" height="120%">
+              <feDropShadow dx="2" dy="3" stdDeviation="5" flood-color="rgba(0,0,0,0.18)"/>
+            </filter>
+          </defs>
+
+          <!-- ── HEAD SHAPE ──
+               Brachycephalic head (top-down view): WIDE transversely, SHORT antero-posterior.
+               Smooth egg-shaped contour, skin colour, same style as the plagiocephaly figure.
+               Centre ≈ (112, 108). Wider than tall: rx > ry.
+          -->
+          <path d="
+            M 112 40
+            C 148 40, 180 54, 192 80
+            C 200 100, 200 128, 190 148
+            C 178 168, 150 178, 112 178
+            C 74 178, 46 168, 34 148
+            C 24 128, 24 100, 32 80
+            C 44 54, 76 40, 112 40 Z
+          " fill="url(#headGradBrachy)" stroke="#d4a890" stroke-width="2" filter="url(#headShadowBrachy)"/>
+
+          <!-- ── FACIAL FEATURES (top-down baby face at top) ── -->
+          <!-- Eyebrows / closed eyes -->
+          <path d="M 92 58 Q 99 54 106 58"  fill="none" stroke="#8a6a58" stroke-width="1.8" stroke-linecap="round"/>
+          <path d="M 118 58 Q 125 54 132 58" fill="none" stroke="#8a6a58" stroke-width="1.8" stroke-linecap="round"/>
+          <!-- Tiny tuft of hair -->
+          <path d="M 108 38 Q 112 30 116 38" fill="#a07060" stroke="#8a5c4a" stroke-width="1" stroke-linecap="round"/>
+
+          <!-- ── EARS (on the wider sides) ── -->
+          <path d="M 34 108 Q 22 110 22 120 Q 22 130 34 130" fill="#f0c8b4" stroke="#d4a890" stroke-width="1.4"/>
+          <path d="M 190 108 Q 202 110 202 120 Q 202 130 190 130" fill="#f0c8b4" stroke="#d4a890" stroke-width="1.4"/>
+
+          <!-- ── DIRECTION LABELS ── -->
+          <text x="112" y="18" text-anchor="middle" font-size="8.5" fill="#9c8070" font-family="Noto Sans KR, sans-serif">전방 (anterior · 미간)</text>
+          <text x="112" y="197" text-anchor="middle" font-size="8.5" fill="#9c8070" font-family="Noto Sans KR, sans-serif">후방 (posterior · 후두부)</text>
+          <text x="8" y="122" text-anchor="middle" font-size="8" fill="#9c8070" font-family="Noto Sans KR, sans-serif">좌</text>
+          <text x="216" y="122" text-anchor="middle" font-size="8" fill="#9c8070" font-family="Noto Sans KR, sans-serif">우</text>
+
+          <!-- ── W line: maximum transverse width (horizontal, ear-to-ear level) ── -->
+          <line x1="36" y1="118" x2="188" y2="118"
+            stroke="#7a2d45" stroke-width="2.4"
+            marker-end="url(#arrowW1)" marker-start="url(#arrowW2)"/>
+
+          <!-- W label -->
+          <rect x="96" y="103" width="26" height="16" rx="4" fill="rgba(122,45,69,0.15)"/>
+          <text x="109" y="115" text-anchor="middle" font-size="11" font-weight="700" fill="#7a2d45" font-family="JetBrains Mono, monospace">W</text>
+
+          <!-- ── L line: maximum AP length (vertical, midline) ── -->
+          <line x1="112" y1="42" x2="112" y2="176"
+            stroke="#b07810" stroke-width="2.4" stroke-dasharray="7,3"
+            marker-end="url(#arrowL1)" marker-start="url(#arrowL2)"/>
+
+          <!-- L label -->
+          <rect x="122" y="107" width="20" height="16" rx="4" fill="rgba(176,120,16,0.15)"/>
+          <text x="132" y="119" text-anchor="middle" font-size="11" font-weight="700" fill="#b07810" font-family="JetBrains Mono, monospace">L</text>
+
+          <!-- Endpoint dots W -->
+          <circle cx="36" cy="118" r="4" fill="#7a2d45" stroke="white" stroke-width="1.2"/>
+          <circle cx="188" cy="118" r="4" fill="#7a2d45" stroke="white" stroke-width="1.2"/>
+          <!-- Endpoint dots L -->
+          <circle cx="112" cy="42" r="4" fill="#b07810" stroke="white" stroke-width="1.2"/>
+          <circle cx="112" cy="176" r="4" fill="#b07810" stroke="white" stroke-width="1.2"/>
+
+          <!-- Landmark labels -->
+          <text x="128" y="48" font-size="7.5" fill="#b07810" font-family="Noto Sans KR, sans-serif" font-style="italic">glabella</text>
+          <text x="120" y="174" font-size="7.5" fill="#b07810" font-family="Noto Sans KR, sans-serif" font-style="italic">occiput</text>
+        </svg>
+        <div class="diagram-legend">
+          <div class="diag-legend-item">
+            <div class="diag-legend-line" style="background:#7a2d45"></div>
+            <span>W — 최대 가로폭 (귀 위 횡경)</span>
+          </div>
+          <div class="diag-legend-item">
+            <div class="diag-legend-line" style="background: repeating-linear-gradient(90deg,#b07810 0,#b07810 5px,transparent 5px,transparent 8px)"></div>
+            <span>L — 최대 전후경 (미간↔후두부)</span>
+          </div>
+        </div>
+      </div>
 
       <!-- 연령 선택 -->
       <div class="age-row">
