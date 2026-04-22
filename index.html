@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>두형 지수 계산기 — 소아 두부 형태 평가</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --cream: #faf8f4;
+  --paper: #f2ede4;
+  --warm: #e6ddd2;
+  --border: #d2c8b8;
+  --ink: #231f18;
+  --ink-light: #5c5040;
+  --ink-faint: #9c8e7c;
+  --teal: #1a5e5e;
+  --teal-light: #e4f2f2;
+  --teal-mid: #2a8888;
+  --rose: #7a2d45;
+  --rose-light: #f7eaee;
+  --rose-mid: #b04060;
+  --amber: #7a5410;
+  --amber-light: #fdf2e0;
+  --amber-mid: #c48010;
+  --green: #275427;
+  --green-light: #ebf5eb;
+  --red: #7a1c1c;
+  --red-light: #fce8e8;
+  --shadow: 0 2px 14px rgba(35,31,24,0.07), 0 1px 3px rgba(35,31,24,0.05);
+  --shadow-lg: 0 8px 36px rgba(35,31,24,0.11), 0 2px 8px rgba(35,31,24,0.07);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--cream);
+  color: var(--ink);
+  font-family: 'Noto Sans KR', sans-serif;
+  min-height: 100vh;
+  background-image:
+    radial-gradient(ellipse at 15% 15%, rgba(26,94,94,0.05) 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 85%, rgba(122,45,69,0.05) 0%, transparent 55%);
+}
+
+/* ── Header ── */
+header {
+  background: var(--ink);
+  color: var(--cream);
+  padding: 26px 40px;
+  display: flex;
+  align-items: flex-end;
+  gap: 20px;
+}
+
+.logo-block h1 {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 1.7rem;
+  font-weight: 700;
+  letter-spacing: -1px;
+  line-height: 1.1;
+}
+
+.logo-block h1 span { color: #6ecece; }
+
+.logo-block p {
+  font-size: 0.68rem;
+  color: rgba(250,248,244,0.45);
+  letter-spacing: 0.1em;
+  margin-top: 5px;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.header-right {
+  margin-left: auto;
+  text-align: right;
+}
+
+.ref-badge {
+  display: inline-block;
+  font-size: 0.6rem;
+  color: rgba(250,248,244,0.4);
+  border: 1px solid rgba(250,248,244,0.15);
+  padding: 3px 9px;
+  border-radius: 3px;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.04em;
+  margin-bottom: 4px;
+}
+
+.ref-note {
+  font-size: 0.6rem;
+  color: rgba(250,248,244,0.3);
+  display: block;
+}
+
+/* ── Tabs ── */
+.tabs {
+  display: flex;
+  background: var(--paper);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  gap: 0;
+}
+
+.tab-btn {
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: var(--ink-faint);
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 14px 22px;
+  cursor: pointer;
+  transition: all 0.18s;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  letter-spacing: -0.3px;
+}
+
+.tab-btn:hover { color: var(--ink); }
+
+.tab-btn.active-teal {
+  color: var(--teal);
+  border-bottom-color: var(--teal-mid);
+  font-weight: 700;
+}
+
+.tab-btn.active-rose {
+  color: var(--rose);
+  border-bottom-color: var(--rose-mid);
+  font-weight: 700;
+}
+
+/* ── Page layout ── */
+.page {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 36px 20px 60px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px;
+}
+
+@media (max-width: 680px) {
+  .page { grid-template-columns: 1fr; padding: 20px 14px 48px; }
+  header { padding: 18px 18px; flex-wrap: wrap; }
+  .logo-block h1 { font-size: 1.3rem; }
+  .tabs { padding: 0 10px; }
+  .tab-btn { font-size: 0.78rem; padding: 12px 14px; }
+}
+
+/* ── Cards ── */
+.card {
+  background: white;
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  animation: fadeUp 0.35s ease both;
+}
+
+.card:nth-child(2) { animation-delay: 0.07s; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.card-header {
+  padding: 18px 22px 14px;
+  border-bottom: 1px solid var(--warm);
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.card-icon {
+  width: 38px; height: 38px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  flex-shrink: 0;
+}
+
+.card-header h2 {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.3;
+  letter-spacing: -0.5px;
+}
+
+.card-header p {
+  font-size: 0.66rem;
+  color: var(--ink-faint);
+  margin-top: 2px;
+}
+
+.card-body { padding: 20px 22px; }
+
+/* ── Form ── */
+.field-group { margin-bottom: 15px; }
+
+.field-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--ink-light);
+  margin-bottom: 6px;
+  letter-spacing: -0.2px;
+}
+
+.field-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.field-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.field-input {
+  flex: 1;
+  background: var(--cream);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.05rem;
+  color: var(--ink);
+  transition: border-color 0.15s, box-shadow 0.15s;
+  -moz-appearance: textfield;
+}
+
+.field-input::-webkit-outer-spin-button,
+.field-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+.field-input:focus {
+  outline: none;
+  border-color: var(--teal-mid);
+  box-shadow: 0 0 0 3px rgba(26,94,94,0.09);
+  background: white;
+}
+
+.card-rose .field-input:focus {
+  border-color: var(--rose-mid);
+  box-shadow: 0 0 0 3px rgba(122,45,69,0.09);
+}
+
+.field-unit {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--ink-faint);
+  min-width: 22px;
+}
+
+.field-hint {
+  font-size: 0.65rem;
+  color: var(--ink-faint);
+  margin-top: 3px;
+  padding-left: 13px;
+  line-height: 1.4;
+}
+
+/* ── Age selector ── */
+.age-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.age-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--ink-light);
+  letter-spacing: -0.2px;
+  white-space: nowrap;
+}
+
+.age-select {
+  flex: 1;
+  min-width: 140px;
+  background: var(--cream);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 0.78rem;
+  color: var(--ink);
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239c8e7c' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 28px;
+  transition: border-color 0.15s;
+}
+
+.age-select:focus {
+  outline: none;
+  border-color: var(--teal-mid);
+}
+
+/* ── Divider ── */
+.divider {
+  height: 1px;
+  background: var(--warm);
+  margin: 18px 0;
+}
+
+/* ── Result chips ── */
+.results-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.result-chip {
+  background: var(--paper);
+  border-radius: 9px;
+  padding: 10px 13px;
+  border: 1px solid var(--warm);
+}
+
+.result-chip-label {
+  font-size: 0.6rem;
+  color: var(--ink-faint);
+  letter-spacing: 0.05em;
+  font-family: 'JetBrains Mono', monospace;
+  margin-bottom: 3px;
+}
+
+.result-chip-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.result-chip-value.empty { color: var(--ink-faint); }
+
+/* ── Big result ── */
+.big-result {
+  border-radius: 11px;
+  padding: 18px;
+  text-align: center;
+  border: 1.5px solid;
+  transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.big-result::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.05;
+  background: radial-gradient(circle at 50% 0%, currentColor, transparent 65%);
+  pointer-events: none;
+}
+
+.big-result-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+  opacity: 0.65;
+}
+
+.big-result-value {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 2.6rem;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 8px;
+  position: relative;
+}
+
+.grade-pill {
+  display: inline-block;
+  font-size: 0.74rem;
+  font-weight: 700;
+  padding: 4px 14px;
+  border-radius: 20px;
+  letter-spacing: -0.2px;
+  margin-bottom: 8px;
+  position: relative;
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+.big-result-desc {
+  font-size: 0.7rem;
+  line-height: 1.6;
+  opacity: 0.75;
+  position: relative;
+  font-family: 'Noto Sans KR', sans-serif;
+  letter-spacing: -0.2px;
+}
+
+/* States */
+.state-empty { background: var(--paper); border-color: var(--border); color: var(--ink-faint); }
+.state-normal { background: var(--green-light); border-color: #a8d5a8; color: var(--green); }
+.state-normal .grade-pill { background: rgba(39,84,39,0.1); }
+.state-mild { background: var(--amber-light); border-color: #e0c070; color: var(--amber); }
+.state-mild .grade-pill { background: rgba(122,84,16,0.1); }
+.state-moderate { background: var(--red-light); border-color: #e0a8a8; color: var(--red); }
+.state-moderate .grade-pill { background: rgba(122,28,28,0.1); }
+.state-severe { background: #fce0e0; border-color: #cc6868; color: #5c0000; }
+.state-severe .grade-pill { background: rgba(92,0,0,0.1); }
+.state-dolicho { background: #e8f0fc; border-color: #a0b8e0; color: #1c3c6c; }
+.state-dolicho .grade-pill { background: rgba(28,60,108,0.1); }
+
+/* ── Formula ── */
+.formula-strip {
+  background: var(--paper);
+  border-radius: 7px;
+  padding: 9px 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  color: var(--ink-light);
+  border: 1px solid var(--warm);
+  margin-top: 11px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.formula-strip .f-label {
+  font-size: 0.58rem;
+  color: var(--ink-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  flex-shrink: 0;
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+/* ── Severity table ── */
+.sev-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 13px;
+  font-size: 0.68rem;
+}
+
+.sev-table th {
+  background: var(--paper);
+  color: var(--ink-faint);
+  font-weight: 600;
+  padding: 7px 10px;
+  text-align: center;
+  border: 1px solid var(--warm);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.04em;
+}
+
+.sev-table td {
+  padding: 7px 10px;
+  text-align: center;
+  border: 1px solid var(--warm);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+}
+
+.sev-table tr.active-row td {
+  font-weight: 700;
+  box-shadow: inset 0 0 0 2px currentColor;
+  border-radius: 3px;
+}
+
+.row-normal td { background: var(--green-light); color: var(--green); }
+.row-mild td { background: var(--amber-light); color: var(--amber); }
+.row-moderate td { background: var(--red-light); color: var(--red); }
+.row-severe td { background: #fce0e0; color: #5c0000; }
+.row-dolicho-mild td { background: #eef3fc; color: #1c3c6c; }
+.row-dolicho-mod td { background: #dce8fc; color: #1c3c6c; }
+.row-dolicho-sev td { background: #c8d8f8; color: #0c2454; }
+
+.table-caption {
+  font-size: 0.62rem;
+  color: var(--ink-faint);
+  margin-top: 5px;
+  line-height: 1.4;
+  letter-spacing: -0.1px;
+}
+
+/* ── CI by age reference ── */
+.age-ref-box {
+  background: var(--paper);
+  border-radius: 8px;
+  padding: 10px 13px;
+  border: 1px solid var(--warm);
+  margin-top: 11px;
+  font-size: 0.65rem;
+  color: var(--ink-light);
+  line-height: 1.65;
+}
+
+.age-ref-box strong {
+  color: var(--ink);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.age-ref-title {
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: var(--ink-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 5px;
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+/* ── Reset button ── */
+.btn-reset {
+  width: 100%;
+  background: none;
+  border: 1.5px solid var(--border);
+  color: var(--ink-faint);
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 9px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+  margin-top: 13px;
+  letter-spacing: -0.2px;
+}
+
+.btn-reset:hover {
+  border-color: var(--ink-light);
+  color: var(--ink);
+  background: var(--paper);
+}
+
+/* ── Source note ── */
+.source-note {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 0 20px 30px;
+  font-size: 0.65rem;
+  color: var(--ink-faint);
+  line-height: 1.6;
+  border-top: 1px solid var(--warm);
+  padding-top: 16px;
+  letter-spacing: -0.1px;
+}
+
+.source-note strong { color: var(--ink-light); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-block">
+    <h1>두형 지수 <span>계산기</span></h1>
+    <p>Pediatric Head Shape Calculator · v2.0</p>
+  </div>
+  <div class="header-right">
+    <span class="ref-badge">기준: Nam et al., Ann Rehabil Med 2021</span>
+    <span class="ref-note">한국 소아 두위 지수 정상 기준값 (n=1,248)</span>
+  </div>
+</header>
+
+<div class="page">
+
+  <!-- ══ 사두증 카드 ══ -->
+  <div class="card card-teal">
+    <div class="card-header">
+      <div class="card-icon" style="background:var(--teal-light)">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1a5e5e" stroke-width="2" stroke-linecap="round">
+          <ellipse cx="12" cy="12" rx="9" ry="7"/>
+          <line x1="5" y1="7" x2="19" y2="17"/>
+          <line x1="5" y1="17" x2="19" y2="7" stroke-dasharray="3 2" opacity="0.4"/>
+        </svg>
+      </div>
+      <div>
+        <h2>사두증 (Plagiocephaly)</h2>
+        <p>두개궁 비대칭 지수 (CVAI) 계산</p>
+      </div>
+    </div>
+
+    <div class="card-body">
+
+      <div class="field-group">
+        <div class="field-label">
+          <div class="field-dot" style="background:#1a5e5e"></div>
+          대각선 A (긴 대각선)
+        </div>
+        <div class="field-row">
+          <input class="field-input" type="number" id="diagA" placeholder="0.0" min="0" step="0.1" oninput="calcCVAI()">
+          <span class="field-unit">mm</span>
+        </div>
+        <div class="field-hint">우측 전방 → 좌측 후방 (긴 쪽)</div>
+      </div>
+
+      <div class="field-group">
+        <div class="field-label">
+          <div class="field-dot" style="background:#b04060"></div>
+          대각선 B (짧은 대각선)
+        </div>
+        <div class="field-row">
+          <input class="field-input" type="number" id="diagB" placeholder="0.0" min="0" step="0.1" oninput="calcCVAI()">
+          <span class="field-unit">mm</span>
+        </div>
+        <div class="field-hint">좌측 전방 → 우측 후방 (짧은 쪽)</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="results-grid">
+        <div class="result-chip">
+          <div class="result-chip-label">대각선 A</div>
+          <div class="result-chip-value empty" id="outA">—</div>
+        </div>
+        <div class="result-chip">
+          <div class="result-chip-label">대각선 B</div>
+          <div class="result-chip-value empty" id="outB">—</div>
+        </div>
+        <div class="result-chip" style="grid-column:span 2">
+          <div class="result-chip-label">대각선 차이 |A − B|</div>
+          <div class="result-chip-value empty" id="outDiff">—</div>
+        </div>
+      </div>
+
+      <div class="big-result state-empty" id="cvaiBox">
+        <div class="big-result-label">CVAI</div>
+        <div class="big-result-value" id="cvaiVal">—</div>
+        <div class="grade-pill" id="cvaiGrade" style="display:none"></div>
+        <div class="big-result-desc" id="cvaiDesc">두 대각선 값을 입력하면 자동 계산됩니다</div>
+      </div>
+
+      <div class="formula-strip">
+        <span class="f-label">계산식</span>
+        CVAI = |A − B| / A × 100
+      </div>
+
+      <!-- CVAI 중증도 기준표 -->
+      <table class="sev-table" style="margin-top:13px">
+        <thead>
+          <tr>
+            <th>중증도</th>
+            <th>CVAI 범위</th>
+            <th>처치 방향</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="row-normal" id="cvai-row-normal">
+            <td>정상</td><td>&lt; 3.5%</td><td>경과 관찰</td>
+          </tr>
+          <tr class="row-mild" id="cvai-row-mild">
+            <td>경증</td><td>3.5 – 6.25%</td><td>자세 교정치료</td>
+          </tr>
+          <tr class="row-moderate" id="cvai-row-moderate">
+            <td>중등도</td><td>6.25 – 8.75%</td><td>헬멧 치료 고려</td>
+          </tr>
+          <tr class="row-severe" id="cvai-row-severe">
+            <td>중증</td><td>&gt; 8.75%</td><td>헬멧 치료 강력 권고</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <button class="btn-reset" onclick="resetCVAI()">✕ 사두증 값 초기화</button>
+    </div>
+  </div>
+
+  <!-- ══ 단두증 카드 ══ -->
+  <div class="card card-rose">
+    <div class="card-header">
+      <div class="card-icon" style="background:var(--rose-light)">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7a2d45" stroke-width="2" stroke-linecap="round">
+          <ellipse cx="12" cy="12" rx="9" ry="6"/>
+          <line x1="3" y1="12" x2="21" y2="12"/>
+          <line x1="12" y1="6" x2="12" y2="18" stroke-dasharray="3 2" opacity="0.4"/>
+        </svg>
+      </div>
+      <div>
+        <h2>단두증 / 장두증</h2>
+        <p>두위 지수 (CI) 계산 — 한국 소아 기준값 적용</p>
+      </div>
+    </div>
+
+    <div class="card-body">
+
+      <!-- 연령 선택 -->
+      <div class="age-row">
+        <span class="age-label">연령 선택</span>
+        <select class="age-select" id="ageGroup" onchange="calcCI()">
+          <option value="">— 연령 선택 —</option>
+          <option value="0-3mo">0 – 3개월</option>
+          <option value="4-6mo">4 – 6개월</option>
+          <option value="7-9mo">7 – 9개월</option>
+          <option value="10-12mo">10 – 12개월</option>
+          <option value="2yr">만 1 – 2세</option>
+          <option value="3yr">만 2 – 3세</option>
+          <option value="4yr">만 3 – 4세</option>
+          <option value="5yr">만 4 – 5세</option>
+          <option value="6yr">만 5 – 6세</option>
+          <option value="7yr">만 6 – 7세</option>
+        </select>
+      </div>
+
+      <div class="field-group">
+        <div class="field-label">
+          <div class="field-dot" style="background:#7a2d45"></div>
+          내외측 폭 (W · 가로)
+        </div>
+        <div class="field-row">
+          <input class="field-input" type="number" id="mlDiam" placeholder="0.0" min="0" step="0.1" oninput="calcCI()">
+          <span class="field-unit">mm</span>
+        </div>
+        <div class="field-hint">양측 귀 위 최대 횡경 (최대 transverse diameter)</div>
+      </div>
+
+      <div class="field-group">
+        <div class="field-label">
+          <div class="field-dot" style="background:#c48010"></div>
+          전후 길이 (L · 세로)
+        </div>
+        <div class="field-row">
+          <input class="field-input" type="number" id="apDiam" placeholder="0.0" min="0" step="0.1" oninput="calcCI()">
+          <span class="field-unit">mm</span>
+        </div>
+        <div class="field-hint">미간 → 후두부 최대 전후경 (glabella – occiput)</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="results-grid">
+        <div class="result-chip">
+          <div class="result-chip-label">W (가로)</div>
+          <div class="result-chip-value empty" id="outML">—</div>
+        </div>
+        <div class="result-chip">
+          <div class="result-chip-label">L (세로)</div>
+          <div class="result-chip-value empty" id="outAP">—</div>
+        </div>
+        <div class="result-chip" style="grid-column:span 2">
+          <div class="result-chip-label">W/L 비율</div>
+          <div class="result-chip-value empty" id="outRatio">—</div>
+        </div>
+      </div>
+
+      <div class="big-result state-empty" id="ciBox">
+        <div class="big-result-label">두위 지수 (CI)</div>
+        <div class="big-result-value" id="ciVal">—</div>
+        <div class="grade-pill" id="ciGrade" style="display:none"></div>
+        <div class="big-result-desc" id="ciDesc">두 직경 값을 입력하면 자동 계산됩니다</div>
+      </div>
+
+      <div class="formula-strip">
+        <span class="f-label">계산식</span>
+        CI = W / L × 100
+      </div>
+
+      <!-- 연령별 평균 참고값 -->
+      <div class="age-ref-box" id="ageRefBox">
+        <div class="age-ref-title">📊 연령별 한국 소아 CI 평균값 (Nam et al. 2021)</div>
+        <div id="ageRefContent" style="color:var(--ink-faint);font-size:0.65rem;">연령을 선택하면 해당 연령의 기준값을 표시합니다.</div>
+      </div>
+
+      <!-- 한국 소아 CI 분류표 -->
+      <table class="sev-table" style="margin-top:11px">
+        <thead>
+          <tr>
+            <th>분류</th>
+            <th>두위 형태</th>
+            <th>CI 범위 (한국 기준)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="row-dolicho-sev" id="ci-row-dolicho-sev">
+            <td>장두증 중증</td><td>Dolichocephaly</td><td>≤ 77.2</td>
+          </tr>
+          <tr class="row-dolicho-mod" id="ci-row-dolicho-mod">
+            <td>장두증 중등도</td><td>Dolichocephaly</td><td>77.3 – 79.5</td>
+          </tr>
+          <tr class="row-dolicho-mild" id="ci-row-dolicho-mild">
+            <td>장두증 경증</td><td>Dolichocephaly</td><td>79.6 – 82.4</td>
+          </tr>
+          <tr class="row-normal" id="ci-row-normal">
+            <td>정상</td><td>Mesocephaly</td><td>80.2 – 93.4</td>
+          </tr>
+          <tr class="row-mild" id="ci-row-mild">
+            <td>단두증 경증</td><td>Brachycephaly</td><td>90.1 – 94.0</td>
+          </tr>
+          <tr class="row-moderate" id="ci-row-moderate">
+            <td>단두증 중등도</td><td>Brachycephaly</td><td>94.1 – 98.5</td>
+          </tr>
+          <tr class="row-severe" id="ci-row-severe">
+            <td>단두증 중증</td><td>Hyperbrachycephaly</td><td>≥ 98.6</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="table-caption">* SD 기반 분류: 정상(±1SD: 80.2–93.4), 단두증(+1~2SD: 93.5–100.0), 과단두증(≥+2SD: ≥100.1), 장두증(≤−1SD: ≤80.1)<br>* 백분위 기반 중증도: 단두증 경증(75–90th), 중등도(90–97th), 중증(&gt;97th) / 장두증 경증(10–25th), 중등도(3–10th), 중증(&lt;3rd)</div>
+
+      <button class="btn-reset" onclick="resetCI()">✕ 단두증 값 초기화</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- Source note -->
+<div class="source-note">
+  <strong>참고문헌:</strong> Nam H, Han N, Eom MJ, Kook M, Kim J. Cephalic Index of Korean Children With Normal Brain Development During the First 7 Years of Life Based on Computed Tomography. <em>Ann Rehabil Med</em> 2021;45(2):141–149. doi: 10.5535/arm.20235<br>
+  두위 지수(CI) 분류는 한국 소아(n=1,248) CT 데이터를 기반으로 한 국내 기준값을 적용하였습니다. 코헨(Cohen) 국제 분류와 상이하므로, 한국 소아 환자에게는 본 앱의 기준값 사용을 권장합니다.
+</div>
+
+<script>
+// ── 연령별 한국 소아 CI 기준값 (Nam et al. 2021, Table 2) ──
+const ageData = {
+  '0-3mo':  { label: '0–3개월',   mean: 89.29, sd: 6.69,  range: '77.44–105.23' },
+  '4-6mo':  { label: '4–6개월',   mean: 91.41, sd: 5.62,  range: '79.85–105.65' },
+  '7-9mo':  { label: '7–9개월',   mean: 89.68, sd: 6.66,  range: '77.89–119.42' },
+  '10-12mo':{ label: '10–12개월', mean: 87.52, sd: 6.86,  range: '74.86–116.64' },
+  '2yr':    { label: '만 1–2세',  mean: 87.64, sd: 7.98,  range: '69.44–127.64' },
+  '3yr':    { label: '만 2–3세',  mean: 86.63, sd: 6.95,  range: '71.28–126.07' },
+  '4yr':    { label: '만 3–4세',  mean: 85.62, sd: 6.00,  range: '71.99–121.81' },
+  '5yr':    { label: '만 4–5세',  mean: 85.77, sd: 5.55,  range: '74.22–122.28' },
+  '6yr':    { label: '만 5–6세',  mean: 85.15, sd: 4.95,  range: '77.18–95.14'  },
+  '7yr':    { label: '만 6–7세',  mean: 85.34, sd: 5.54,  range: '73.89–99.66'  },
+};
+
+// ── CVAI 계산 ──────────────────────────────────────────────
+function calcCVAI() {
+  const a = parseFloat(document.getElementById('diagA').value);
+  const b = parseFloat(document.getElementById('diagB').value);
+
+  const oA = document.getElementById('outA');
+  const oB = document.getElementById('outB');
+  const oDiff = document.getElementById('outDiff');
+  const box = document.getElementById('cvaiBox');
+  const valEl = document.getElementById('cvaiVal');
+  const gradeEl = document.getElementById('cvaiGrade');
+  const descEl = document.getElementById('cvaiDesc');
+
+  if (!isNaN(a) && a > 0) { oA.textContent = a.toFixed(1) + ' mm'; oA.className = 'result-chip-value'; }
+  else { oA.textContent = '—'; oA.className = 'result-chip-value empty'; }
+
+  if (!isNaN(b) && b > 0) { oB.textContent = b.toFixed(1) + ' mm'; oB.className = 'result-chip-value'; }
+  else { oB.textContent = '—'; oB.className = 'result-chip-value empty'; }
+
+  // Reset row highlights
+  ['normal','mild','moderate','severe'].forEach(r => {
+    const el = document.getElementById('cvai-row-' + r);
+    if (el) el.classList.remove('active-row');
+  });
+
+  if (!isNaN(a) && !isNaN(b) && a > 0 && b > 0) {
+    const larger = Math.max(a, b), smaller = Math.min(a, b);
+    const diff = larger - smaller;
+    const cvai = (diff / larger) * 100;
+
+    oDiff.textContent = diff.toFixed(1) + ' mm'; oDiff.className = 'result-chip-value';
+    valEl.textContent = cvai.toFixed(2) + '%';
+    gradeEl.style.display = 'inline-block';
+
+    let stateClass, grade, desc, rowId;
+    if (cvai < 3.5) {
+      stateClass = 'state-normal'; grade = '정상'; rowId = 'normal';
+      desc = '두개궁 비대칭이 정상 범위 내에 있습니다. 정기적 경과 관찰을 유지하세요.';
+    } else if (cvai < 6.25) {
+      stateClass = 'state-mild'; grade = '경증 사두증'; rowId = 'mild';
+      desc = '경증 비대칭 소견입니다. 자세 교정치료 및 물리치료를 권고하며 주기적 추적 관찰이 필요합니다.';
+    } else if (cvai < 8.75) {
+      stateClass = 'state-moderate'; grade = '중등도 사두증'; rowId = 'moderate';
+      desc = '중등도 비대칭 소견입니다. 연령 및 진행 정도에 따라 두형 교정 헬멧(cranial orthosis) 치료를 적극 고려하십시오.';
+    } else {
+      stateClass = 'state-severe'; grade = '중증 사두증'; rowId = 'severe';
+      desc = '중증 비대칭 소견입니다. 두형 교정 헬멧 치료가 강력히 권고됩니다. 전문의 의뢰를 고려하세요.';
+    }
+
+    box.className = 'big-result ' + stateClass;
+    gradeEl.textContent = grade;
+    descEl.textContent = desc;
+    const activeRow = document.getElementById('cvai-row-' + rowId);
+    if (activeRow) activeRow.classList.add('active-row');
+  } else {
+    oDiff.textContent = '—'; oDiff.className = 'result-chip-value empty';
+    box.className = 'big-result state-empty';
+    valEl.textContent = '—'; gradeEl.style.display = 'none';
+    descEl.textContent = '두 대각선 값을 입력하면 자동 계산됩니다';
+  }
+}
+
+function resetCVAI() {
+  document.getElementById('diagA').value = '';
+  document.getElementById('diagB').value = '';
+  calcCVAI();
+}
+
+// ── CI 계산 ────────────────────────────────────────────────
+function calcCI() {
+  const w = parseFloat(document.getElementById('mlDiam').value);
+  const l = parseFloat(document.getElementById('apDiam').value);
+  const age = document.getElementById('ageGroup').value;
+
+  const oML = document.getElementById('outML');
+  const oAP = document.getElementById('outAP');
+  const oRatio = document.getElementById('outRatio');
+  const box = document.getElementById('ciBox');
+  const valEl = document.getElementById('ciVal');
+  const gradeEl = document.getElementById('ciGrade');
+  const descEl = document.getElementById('ciDesc');
+  const refContent = document.getElementById('ageRefContent');
+
+  // Age reference display
+  if (age && ageData[age]) {
+    const d = ageData[age];
+    const plus1 = (d.mean + d.sd).toFixed(2);
+    const minus1 = (d.mean - d.sd).toFixed(2);
+    const plus2 = (d.mean + 2*d.sd).toFixed(2);
+    const minus2 = (d.mean - 2*d.sd).toFixed(2);
+    refContent.innerHTML =
+      `<b>${d.label}</b> 한국 소아 평균 CI: <strong>${d.mean.toFixed(2)} ± ${d.sd.toFixed(2)}</strong> (범위: ${d.range})<br>` +
+      `정상 (±1SD): <strong>${minus1} – ${plus1}</strong> &nbsp;|&nbsp; ` +
+      `단두증 (+1~+2SD): <strong>${plus1} – ${plus2}</strong> &nbsp;|&nbsp; ` +
+      `장두증 (≤−1SD): <strong>≤ ${minus1}</strong>`;
+    refContent.style.color = 'var(--ink-light)';
+  } else {
+    refContent.innerHTML = '연령을 선택하면 해당 연령의 기준값을 표시합니다.';
+    refContent.style.color = 'var(--ink-faint)';
+  }
+
+  if (!isNaN(w) && w > 0) { oML.textContent = w.toFixed(1) + ' mm'; oML.className = 'result-chip-value'; }
+  else { oML.textContent = '—'; oML.className = 'result-chip-value empty'; }
+
+  if (!isNaN(l) && l > 0) { oAP.textContent = l.toFixed(1) + ' mm'; oAP.className = 'result-chip-value'; }
+  else { oAP.textContent = '—'; oAP.className = 'result-chip-value empty'; }
+
+  // Reset row highlights
+  ['normal','mild','moderate','severe','dolicho-mild','dolicho-mod','dolicho-sev'].forEach(r => {
+    const el = document.getElementById('ci-row-' + r);
+    if (el) el.classList.remove('active-row');
+  });
+
+  if (!isNaN(w) && !isNaN(l) && w > 0 && l > 0) {
+    const ci = (w / l) * 100;
+    oRatio.textContent = (w / l).toFixed(3); oRatio.className = 'result-chip-value';
+    valEl.textContent = ci.toFixed(1) + '%';
+    gradeEl.style.display = 'inline-block';
+
+    let stateClass, grade, desc, rowId;
+
+    // Korean classification (Nam et al. 2021, Table 3 & 4)
+    // SD-based: dolichocephaly ≤80.1, mesocephaly 80.2–93.4, brachy 93.5–100.0, hyperbr ≥100.1
+    // Percentile-based severity for brachy: mild 90.1–94.0, moderate 94.1–98.5, severe ≥98.6
+    // Percentile-based severity for dolicho: mild 79.6–82.4, moderate 77.3–79.5, severe ≤77.2
+
+    if (ci <= 77.2) {
+      stateClass = 'state-severe'; grade = '장두증 중증'; rowId = 'dolicho-sev';
+      desc = '중증 장두증 소견입니다 (CI ≤77.2, <3rd 백분위). 시상봉합 조기유합(sagittal craniosynostosis) 감별이 필요합니다. 전문의 의뢰를 권고합니다.';
+    } else if (ci <= 79.5) {
+      stateClass = 'state-moderate'; grade = '장두증 중등도'; rowId = 'dolicho-mod';
+      desc = '중등도 장두증 소견입니다 (CI 77.3–79.5, 3–10th 백분위). 두개골 조기유합 가능성을 평가하고, 필요 시 전문과 협진을 고려하십시오.';
+    } else if (ci <= 82.4) {
+      stateClass = 'state-dolicho'; grade = '장두증 경증'; rowId = 'dolicho-mild';
+      desc = '경증 장두증 소견입니다 (CI 79.6–82.4, 10–25th 백분위). 주기적 추적 관찰 및 자세 교정치료를 권고합니다.';
+    } else if (ci <= 93.4) {
+      stateClass = 'state-normal'; grade = '정상 (정두증)'; rowId = 'normal';
+      desc = '두위 지수가 한국 소아 정상 범위(정두증, ±1SD: 80.2–93.4) 내에 있습니다.';
+    } else if (ci <= 94.0) {
+      stateClass = 'state-mild'; grade = '단두증 경증'; rowId = 'mild';
+      desc = '경증 단두증 소견입니다 (CI 90.1–94.0, 75–90th 백분위). 엎드린 자세 시간 증가 및 자세 교정치료를 시작하십시오.';
+    } else if (ci <= 98.5) {
+      stateClass = 'state-moderate'; grade = '단두증 중등도'; rowId = 'moderate';
+      desc = '중등도 단두증 소견입니다 (CI 94.1–98.5, 90–97th 백분위). 두형 교정 헬멧(cranial orthosis) 치료를 적극 고려하십시오.';
+    } else {
+      stateClass = 'state-severe'; grade = '단두증 중증 (과단두증)'; rowId = 'severe';
+      desc = '중증 단두증(과단두증) 소견입니다 (CI ≥98.6, >97th 백분위). 두형 교정 헬멧 치료가 강력히 권고됩니다. 전문의 의뢰를 고려하세요.';
+    }
+
+    // If age selected, additionally show age-specific z-score
+    let ageNote = '';
+    if (age && ageData[age]) {
+      const d = ageData[age];
+      const z = ((ci - d.mean) / d.sd).toFixed(2);
+      ageNote = ` (해당 연령 Z-score: ${z > 0 ? '+' : ''}${z})`;
+    }
+
+    box.className = 'big-result ' + stateClass;
+    gradeEl.textContent = grade;
+    descEl.textContent = desc + ageNote;
+    const activeRow = document.getElementById('ci-row-' + rowId);
+    if (activeRow) activeRow.classList.add('active-row');
+  } else {
+    oRatio.textContent = '—'; oRatio.className = 'result-chip-value empty';
+    box.className = 'big-result state-empty';
+    valEl.textContent = '—'; gradeEl.style.display = 'none';
+    descEl.textContent = '두 직경 값을 입력하면 자동 계산됩니다';
+  }
+}
+
+function resetCI() {
+  document.getElementById('mlDiam').value = '';
+  document.getElementById('apDiam').value = '';
+  document.getElementById('ageGroup').value = '';
+  calcCI();
+}
+</script>
+</body>
+</html>
