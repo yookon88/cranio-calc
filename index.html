@@ -2,10 +2,11 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>두형 지수 계산기 — 소아 두부 형태 평가</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>두형 지수 계산기</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
 :root {
   --cream: #faf8f4;
@@ -30,6 +31,54 @@
   --red-light: #fce8e8;
   --shadow: 0 2px 14px rgba(35,31,24,0.07), 0 1px 3px rgba(35,31,24,0.05);
   --shadow-lg: 0 8px 36px rgba(35,31,24,0.11), 0 2px 8px rgba(35,31,24,0.07);
+  --surface: #ffffff;
+  --hdr-bg: #231f18;
+  --hdr-fg: #faf8f4;
+  --hdr-accent: #6ecece;
+  --green-line: #a8d5a8;
+  --amber-line: #e0c070;
+  --red-line: #e0a8a8;
+  --severe-bg: #fce0e0;
+  --severe-line: #cc6868;
+  --severe-fg: #5c0000;
+  --blue-bg: #e8f0fc;
+  --blue-line: #a0b8e0;
+  --blue-fg: #1c3c6c;
+  --blue-bg2: #eef3fc;
+  --blue-bg3: #dce8fc;
+  --blue-bg4: #c8d8f8;
+  --blue-fg2: #0c2454;
+}
+
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --cream: #151819; --paper: #1d2122; --warm: #2a2f30; --border: #3a4143;
+  --ink: #ece6dc; --ink-light: #c4b9a9; --ink-faint: #8f8576;
+  --teal: #7fd0d0; --teal-light: #173232; --teal-mid: #4fb0b0;
+  --rose: #e897b0; --rose-light: #36202a; --rose-mid: #d27592;
+  --amber: #e9be6a; --amber-light: #322710; --amber-mid: #e0a030;
+  --green: #95d495; --green-light: #172d19; --red: #f1a0a0; --red-light: #361a1a;
+  --surface: #1a1e1f; --hdr-bg: #0d0f10; --hdr-fg: #ece6dc; --hdr-accent: #6ecece;
+  --green-line: #3d6b3d; --amber-line: #6e5a24; --red-line: #6e3434;
+  --severe-bg: #451818; --severe-line: #9c4848; --severe-fg: #ffc2c2;
+  --blue-bg: #18243a; --blue-line: #3c5680; --blue-fg: #a9c4ee;
+  --blue-bg2: #172133; --blue-bg3: #1c2a44; --blue-bg4: #233458; --blue-fg2: #c3d6f6;
+  --shadow: 0 2px 14px rgba(0,0,0,0.35); --shadow-lg: 0 8px 36px rgba(0,0,0,0.45);
+  color-scheme: dark;
+} }
+:root[data-theme="dark"] {
+  --cream: #151819; --paper: #1d2122; --warm: #2a2f30; --border: #3a4143;
+  --ink: #ece6dc; --ink-light: #c4b9a9; --ink-faint: #8f8576;
+  --teal: #7fd0d0; --teal-light: #173232; --teal-mid: #4fb0b0;
+  --rose: #e897b0; --rose-light: #36202a; --rose-mid: #d27592;
+  --amber: #e9be6a; --amber-light: #322710; --amber-mid: #e0a030;
+  --green: #95d495; --green-light: #172d19; --red: #f1a0a0; --red-light: #361a1a;
+  --surface: #1a1e1f; --hdr-bg: #0d0f10; --hdr-fg: #ece6dc; --hdr-accent: #6ecece;
+  --green-line: #3d6b3d; --amber-line: #6e5a24; --red-line: #6e3434;
+  --severe-bg: #451818; --severe-line: #9c4848; --severe-fg: #ffc2c2;
+  --blue-bg: #18243a; --blue-line: #3c5680; --blue-fg: #a9c4ee;
+  --blue-bg2: #172133; --blue-bg3: #1c2a44; --blue-bg4: #233458; --blue-fg2: #c3d6f6;
+  --shadow: 0 2px 14px rgba(0,0,0,0.35); --shadow-lg: 0 8px 36px rgba(0,0,0,0.45);
+  color-scheme: dark;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -38,7 +87,6 @@ body {
   background: var(--cream);
   color: var(--ink);
   font-family: 'Noto Sans KR', sans-serif;
-  min-height: 100vh;
   background-image:
     radial-gradient(ellipse at 15% 15%, rgba(26,94,94,0.05) 0%, transparent 55%),
     radial-gradient(ellipse at 85% 85%, rgba(122,45,69,0.05) 0%, transparent 55%);
@@ -46,8 +94,8 @@ body {
 
 /* ── Header ── */
 header {
-  background: var(--ink);
-  color: var(--cream);
+  background: var(--hdr-bg);
+  color: var(--hdr-fg);
   padding: 26px 40px;
   display: flex;
   align-items: flex-end;
@@ -62,11 +110,11 @@ header {
   line-height: 1.1;
 }
 
-.logo-block h1 span { color: #6ecece; }
+.logo-block h1 span { color: var(--hdr-accent); }
 
 .logo-block p {
   font-size: 0.68rem;
-  color: rgba(250,248,244,0.45);
+  color: var(--hdr-fg); opacity: .5;
   letter-spacing: 0.1em;
   margin-top: 5px;
   font-family: 'JetBrains Mono', monospace;
@@ -80,8 +128,8 @@ header {
 .ref-badge {
   display: inline-block;
   font-size: 0.6rem;
-  color: rgba(250,248,244,0.4);
-  border: 1px solid rgba(250,248,244,0.15);
+  color: var(--hdr-fg); opacity: .55;
+  border: 1px solid currentColor;
   padding: 3px 9px;
   border-radius: 3px;
   font-family: 'JetBrains Mono', monospace;
@@ -91,7 +139,7 @@ header {
 
 .ref-note {
   font-size: 0.6rem;
-  color: rgba(250,248,244,0.3);
+  color: var(--hdr-fg); opacity: .4;
   display: block;
 }
 
@@ -146,7 +194,8 @@ header {
 }
 
 @media (max-width: 680px) {
-  .page { grid-template-columns: 1fr; padding: 20px 14px 48px; }
+  .page { grid-template-columns: 1fr; padding: 20px 16px 48px; }
+  .source-note { padding-left: 16px; padding-right: 16px; }
   header { padding: 18px 18px; flex-wrap: wrap; }
   .logo-block h1 { font-size: 1.3rem; }
   .tabs { padding: 0 10px; }
@@ -155,18 +204,19 @@ header {
 
 /* ── Cards ── */
 .card {
-  background: white;
+  background: var(--surface);
   border-radius: 14px;
   box-shadow: var(--shadow);
   border: 1px solid var(--border);
   overflow: hidden;
+  min-width: 0;
   animation: fadeUp 0.35s ease both;
 }
 
 .card:nth-child(2) { animation-delay: 0.07s; }
 
 @keyframes fadeUp {
-  from { opacity: 0; transform: translateY(8px); }
+  from { opacity: 0.4; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
@@ -251,7 +301,7 @@ header {
   outline: none;
   border-color: var(--teal-mid);
   box-shadow: 0 0 0 3px rgba(26,94,94,0.09);
-  background: white;
+  background: var(--surface);
 }
 
 .card-rose .field-input:focus {
@@ -415,15 +465,15 @@ header {
 
 /* States */
 .state-empty { background: var(--paper); border-color: var(--border); color: var(--ink-faint); }
-.state-normal { background: var(--green-light); border-color: #a8d5a8; color: var(--green); }
+.state-normal { background: var(--green-light); border-color: var(--green-line); color: var(--green); }
 .state-normal .grade-pill { background: rgba(39,84,39,0.1); }
-.state-mild { background: var(--amber-light); border-color: #e0c070; color: var(--amber); }
+.state-mild { background: var(--amber-light); border-color: var(--amber-line); color: var(--amber); }
 .state-mild .grade-pill { background: rgba(122,84,16,0.1); }
-.state-moderate { background: var(--red-light); border-color: #e0a8a8; color: var(--red); }
+.state-moderate { background: var(--red-light); border-color: var(--red-line); color: var(--red); }
 .state-moderate .grade-pill { background: rgba(122,28,28,0.1); }
-.state-severe { background: #fce0e0; border-color: #cc6868; color: #5c0000; }
+.state-severe { background: var(--severe-bg); border-color: var(--severe-line); color: var(--severe-fg); }
 .state-severe .grade-pill { background: rgba(92,0,0,0.1); }
-.state-dolicho { background: #e8f0fc; border-color: #a0b8e0; color: #1c3c6c; }
+.state-dolicho { background: var(--blue-bg); border-color: var(--blue-line); color: var(--blue-fg); }
 .state-dolicho .grade-pill { background: rgba(28,60,108,0.1); }
 
 /* ── Formula ── */
@@ -488,10 +538,10 @@ header {
 .row-normal td { background: var(--green-light); color: var(--green); }
 .row-mild td { background: var(--amber-light); color: var(--amber); }
 .row-moderate td { background: var(--red-light); color: var(--red); }
-.row-severe td { background: #fce0e0; color: #5c0000; }
-.row-dolicho-mild td { background: #eef3fc; color: #1c3c6c; }
-.row-dolicho-mod td { background: #dce8fc; color: #1c3c6c; }
-.row-dolicho-sev td { background: #c8d8f8; color: #0c2454; }
+.row-severe td { background: var(--severe-bg); color: var(--severe-fg); }
+.row-dolicho-mild td { background: var(--blue-bg2); color: var(--blue-fg); }
+.row-dolicho-mod td { background: var(--blue-bg3); color: var(--blue-fg); }
+.row-dolicho-sev td { background: var(--blue-bg4); color: var(--blue-fg2); }
 
 .table-caption {
   font-size: 0.62rem;
@@ -615,14 +665,69 @@ header {
 }
 
 .source-note strong { color: var(--ink-light); }
+
+/* ── 예상 기간 카드 (스프레드시트 연동) ── */
+.card-wide { grid-column: 1 / -1; }
+.pred-layout { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 26px; }
+@media (max-width: 760px) { .pred-layout { grid-template-columns: 1fr; gap: 18px; } }
+.pred-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 12px; align-content: start; }
+.pred-inputs .field-group { margin-bottom: 0; min-width: 0; }
+.pred-inputs .field-input { width: 100%; min-width: 0; }
+.pred-actions { grid-column: 1 / -1; display: flex; gap: 8px; flex-wrap: wrap; }
+.btn-soft {
+  flex: 1 1 140px; background: var(--paper); border: 1.5px solid var(--border); color: var(--ink-light);
+  font-family: 'Noto Sans KR', sans-serif; font-size: 0.74rem; font-weight: 500; padding: 9px 10px;
+  border-radius: 8px; cursor: pointer; transition: all 0.15s; letter-spacing: -0.2px;
+}
+.btn-soft:hover { border-color: var(--teal-mid); color: var(--teal); }
+.btn-soft:focus-visible, .btn-reset:focus-visible, .field-input:focus-visible, .age-select:focus-visible { outline: 2px solid var(--teal-mid); outline-offset: 2px; }
+.pred-hint { grid-column: 1 / -1; font-size: 0.65rem; color: var(--ink-faint); line-height: 1.5; }
+
+.sync-line {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  font-size: 0.68rem; color: var(--ink-light); font-family: 'Noto Sans KR', sans-serif; line-height: 1.45;
+  background: var(--paper); border: 1px solid var(--warm); border-radius: 7px; padding: 7px 10px; margin-bottom: 12px;
+}
+.sync-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ink-faint); flex-shrink: 0; }
+.sync-line.ok .sync-dot { background: var(--teal-mid); }
+.sync-line.loading .sync-dot { background: var(--amber-mid); }
+.sync-line.err { color: var(--red); border-color: var(--red-line); background: var(--red-light); }
+.sync-line.err .sync-dot { background: var(--red); }
+.sync-line button { margin-left: auto; background: none; border: none; color: inherit; text-decoration: underline; cursor: pointer; font: inherit; padding: 0; }
+
+.pred-bin { font-size: 0.72rem; color: var(--ink-light); margin-bottom: 10px; line-height: 1.5; }
+.pred-bin strong { color: var(--ink); }
+.pred-tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+@media (max-width: 460px) { .pred-tiles { grid-template-columns: 1fr; } }
+.pred-tile { border: 1.5px solid; border-radius: 10px; padding: 12px 12px 11px; min-width: 0; }
+.pred-tile .pt-label { font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; letter-spacing: 0.08em; opacity: 0.75; margin-bottom: 4px; }
+.pred-tile .pt-value { font-family: 'Noto Serif KR', serif; font-weight: 700; font-size: 1.9rem; line-height: 1.05; font-variant-numeric: tabular-nums; }
+.pred-tile .pt-value small { font-family: 'Noto Sans KR', sans-serif; font-size: 0.75rem; font-weight: 500; margin-left: 2px; }
+.pred-tile .pt-sub { font-size: 0.64rem; line-height: 1.5; margin-top: 6px; opacity: 0.85; }
+.pred-tile.t-empty { background: var(--paper); border-color: var(--border); color: var(--ink-faint); }
+.pred-tile.t-normal { background: var(--green-light); border-color: var(--green-line); color: var(--green); }
+.pred-tile.t-short { background: var(--teal-light); border-color: var(--teal-mid); color: var(--teal); }
+.pred-tile.t-mid { background: var(--amber-light); border-color: var(--amber-line); color: var(--amber); }
+.pred-tile.t-long { background: var(--red-light); border-color: var(--red-line); color: var(--red); }
+
+.rate-wrap { overflow-x: auto; margin-top: 16px; }
+.rate-table { width: 100%; border-collapse: collapse; font-size: 0.68rem; font-variant-numeric: tabular-nums; min-width: 460px; }
+.rate-table th { background: var(--paper); color: var(--ink-faint); font-weight: 600; padding: 7px 8px; border: 1px solid var(--warm); font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; text-align: center; }
+.rate-table td { padding: 7px 8px; border: 1px solid var(--warm); text-align: center; font-family: 'JetBrains Mono', monospace; color: var(--ink-light); }
+.rate-table td:first-child { font-family: 'Noto Sans KR', sans-serif; text-align: left; color: var(--ink); }
+.rate-table tr.is-bin td { background: var(--teal-light); color: var(--teal); font-weight: 700; }
+.rate-table tr.is-all td { border-top: 2px solid var(--border); }
+.rate-table td.na { color: var(--ink-faint); }
+.rate-empty { padding: 14px; text-align: center; color: var(--ink-faint); font-size: 0.7rem; }
+
+@media (prefers-reduced-motion: reduce) { .card { animation: none; } }
 </style>
 </head>
 <body>
-
 <header>
   <div class="logo-block">
     <h1>두형 지수 <span>계산기</span></h1>
-    <p>Pediatric Head Shape Calculator · v2.0</p>
+    <p>Pediatric Head Shape Calculator · v2.1</p>
   </div>
   <div class="header-right">
     <span class="ref-badge">기준: Nam et al., Ann Rehabil Med 2021</span>
@@ -636,7 +741,7 @@ header {
   <div class="card card-teal">
     <div class="card-header">
       <div class="card-icon" style="background:var(--teal-light)">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1a5e5e" stroke-width="2" stroke-linecap="round">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="color:var(--teal)" stroke-width="2" stroke-linecap="round">
           <ellipse cx="12" cy="12" rx="9" ry="7"/>
           <line x1="5" y1="7" x2="19" y2="17"/>
           <line x1="5" y1="17" x2="19" y2="7" stroke-dasharray="3 2" opacity="0.4"/>
@@ -832,7 +937,7 @@ header {
   <div class="card card-rose">
     <div class="card-header">
       <div class="card-icon" style="background:var(--rose-light)">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7a2d45" stroke-width="2" stroke-linecap="round">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="color:var(--rose)" stroke-width="2" stroke-linecap="round">
           <ellipse cx="12" cy="12" rx="9" ry="6"/>
           <line x1="3" y1="12" x2="21" y2="12"/>
           <line x1="12" y1="6" x2="12" y2="18" stroke-dasharray="3 2" opacity="0.4"/>
@@ -1064,6 +1169,89 @@ header {
     </div>
   </div>
 
+  <!-- ══ 헬멧 치료 예상 기간 카드 (스프레드시트 연동) ══ -->
+  <div class="card card-wide">
+    <div class="card-header">
+      <div class="card-icon" style="background:var(--amber-light)">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="color:var(--amber)" stroke-width="2" stroke-linecap="round">
+          <circle cx="12" cy="12" r="9"/>
+          <polyline points="12 7 12 12 15.5 14"/>
+        </svg>
+      </div>
+      <div>
+        <h2>헬멧 치료 예상 기간 (정상까지)</h2>
+        <p>사두 스프레드시트의 연령별 평균 교정 속도(Rate_by_age)로 계산 · 시트가 바뀌면 자동 반영</p>
+      </div>
+    </div>
+
+    <div class="card-body">
+      <div class="pred-layout">
+        <form class="pred-inputs" id="predForm" autocomplete="off">
+          <div class="field-group" style="grid-column:1 / -1">
+            <div class="field-label"><div class="field-dot" style="background:var(--amber-mid)"></div>시작 나이 (교정 연령)</div>
+            <div class="field-row">
+              <input class="field-input" type="number" id="pAge" value="5" min="0" step="1" inputmode="numeric">
+              <span class="field-unit">개월</span>
+            </div>
+          </div>
+          <div class="field-group">
+            <div class="field-label"><div class="field-dot" style="background:var(--teal-mid)"></div>시작 DD</div>
+            <div class="field-row">
+              <input class="field-input" type="number" id="pDD" value="16" min="0" step="0.1" inputmode="decimal">
+              <span class="field-unit">mm</span>
+            </div>
+          </div>
+          <div class="field-group">
+            <div class="field-label"><div class="field-dot" style="background:var(--teal)"></div>시작 CVAI</div>
+            <div class="field-row">
+              <input class="field-input" type="number" id="pCVAI" value="10" min="0" step="0.1" inputmode="decimal">
+              <span class="field-unit">%</span>
+            </div>
+          </div>
+          <div class="field-group">
+            <div class="field-label"><div class="field-dot" style="background:var(--rose-mid)"></div>시작 CI</div>
+            <div class="field-row">
+              <input class="field-input" type="number" id="pCI" value="95" min="0" step="0.1" inputmode="decimal">
+              <span class="field-unit">%</span>
+            </div>
+          </div>
+          <div class="pred-actions">
+            <button type="button" class="btn-soft" id="pFromAbove">위 계산 결과 가져오기</button>
+            <button type="button" class="btn-soft" id="pClear">입력 지우기</button>
+          </div>
+          <div class="pred-hint">해당 없는 항목은 비워 두세요. 처음 열면 예시 값(5개월 · DD 16 · CVAI 10 · CI 95)이 들어 있습니다. 미숙아는 교정 연령으로 입력하세요.</div>
+        </form>
+
+        <div style="min-width:0">
+          <div class="sync-line loading" id="syncLine" role="status" aria-live="polite">
+            <span class="sync-dot"></span><span id="syncText">스프레드시트에서 교정 속도를 불러오는 중…</span>
+          </div>
+          <div class="pred-bin" id="predBin">시트 데이터를 불러오면 나이 구간과 근거 환아 수가 표시됩니다.</div>
+          <div class="pred-tiles">
+            <div class="pred-tile t-empty" id="tDD"><div class="pt-label">DD → 정상</div><div class="pt-value">—</div><div class="pt-sub"></div></div>
+            <div class="pred-tile t-empty" id="tCVAI"><div class="pt-label">CVAI → 정상</div><div class="pt-value">—</div><div class="pt-sub"></div></div>
+            <div class="pred-tile t-empty" id="tCI"><div class="pt-label">CI → 정상</div><div class="pt-value">—</div><div class="pt-sub"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="rate-wrap">
+        <table class="rate-table" id="rateTable">
+          <thead>
+            <tr><th>나이 구간</th><th>N (DD)</th><th>DD mm/월</th><th>N (CVAI)</th><th>CVAI /월</th><th>N (CI)</th><th>CI /월</th></tr>
+          </thead>
+          <tbody id="rateBody"><tr><td colspan="7" class="rate-empty">스프레드시트 연결 후 연령별 평균 교정 속도가 여기에 표시됩니다.</td></tr></tbody>
+        </table>
+      </div>
+
+      <div class="formula-strip">
+        <span class="f-label">계산식</span>
+        예상 개월 = (시작값 − 정상 기준) ÷ 해당 나이 구간 평균 교정 속도
+      </div>
+      <div class="table-caption" id="predCaption">* 평균 속도는 f/u 기간이 최소 기준 이상인 환아만으로 계산되며, 변화가 일정하다고 가정한 추정치입니다. 실제로는 치료 후반에 교정 속도가 느려지는 경우가 많아 실제 기간이 더 길어질 수 있습니다. 근거 환아 수가 적은 구간은 해석에 주의하세요.</div>
+    </div>
+  </div>
+
 </div>
 
 <!-- Source note -->
@@ -1258,6 +1446,326 @@ function resetCI() {
   document.getElementById('ageGroup').value = '';
   calcCI();
 }
+
+// ── 헬멧 치료 예상 기간: 사두 스프레드시트 연동 ─────────────────
+(function () {
+  const SERVER = 'Google Sheets';
+  const SHEET_ID = '1s2Hd14xLZoE39DfLqPvaGe8MN6sGq2z8Sh-eiiZ_4s4';
+  const RATE_RANGE = 'Rate_by_age!A1:I6';
+  const THR_RANGE = 'Thresholds!A1:C5';
+
+  // ▼ GitHub Pages 등 claude.ai 밖에서 쓸 때: Google Sheets의
+  //   아래 링크는 [파일 → 공유 → 웹에 게시]에서 Rate_by_age 탭과
+  //   Thresholds 탭을 게시해야 열립니다. 게시가 꺼져 있으면 읽지 못합니다.
+  //   (환자 이름이 있는 Summary·Visits 탭은 게시하지 마세요.)
+  const CSV_URLS = {
+    rate: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSHsxPnne1kU97P9E7C5YjKUS08XGz9A6Jw0GoAGmspIiGnPH-1VOyh97eeR9tDNhRGHHkZNld_9E_A/pub?gid=105&single=true&output=csv',  // Rate_by_age
+    thr:  'https://docs.google.com/spreadsheets/d/e/2PACX-1vSHsxPnne1kU97P9E7C5YjKUS08XGz9A6Jw0GoAGmspIiGnPH-1VOyh97eeR9tDNhRGHHkZNld_9E_A/pub?gid=104&single=true&output=csv',  // Thresholds
+  };
+  const $ = id => document.getElementById(id);
+
+  const state = { rates: null, thr: null, storedAt: { rate: 0, thr: 0 }, error: null };
+  let mcpRef = null;
+  let csvMode = false;
+
+  const num = v => {
+    if (v === undefined || v === null) return NaN;
+    const s = String(v).replace(/,/g, '').trim();
+    return s === '' ? NaN : parseFloat(s);
+  };
+
+  function valuesOf(result) {
+    let p = result && result.payload;
+    if (!p && result && Array.isArray(result.content)) {
+      const t = result.content.find(c => c.type === 'text');
+      if (t) { try { p = JSON.parse(t.text); } catch (e) { p = null; } }
+    }
+    return p && Array.isArray(p.values) ? p.values : null;
+  }
+
+  function parseRates(values) {
+    const rows = values.slice(1).filter(r => r && r.length >= 3 && r[2] !== '');
+    const items = rows.map(r => ({
+      lo: num(r[0]), hi: num(r[1]), label: String(r[2]),
+      DD: { n: num(r[3]), rate: num(r[4]) },
+      CVAI: { n: num(r[5]), rate: num(r[6]) },
+      CI: { n: num(r[7]), rate: num(r[8]) },
+    })).filter(b => !isNaN(b.lo) && !isNaN(b.hi));
+    const all = items.find(b => /전체/.test(b.label)) || items[items.length - 1] || null;
+    const bins = items.filter(b => b !== all);
+    return { bins, all };
+  }
+
+  function parseThr(values) {
+    const t = { DD: NaN, CVAI: NaN, CI: NaN, minFu: NaN };
+    values.slice(1).forEach(r => {
+      const k = String(r[0] || '').trim(), v = num(r[1]);
+      if (/^DD/i.test(k)) t.DD = v;
+      else if (/^CVAI/i.test(k)) t.CVAI = v;
+      else if (/^CI/i.test(k)) t.CI = v;
+      else if (/f\/u|최소/.test(k)) t.minFu = v;
+    });
+    return t;
+  }
+
+  const fmt = (v, d = 2) => (isNaN(v) ? '—' : v.toFixed(d));
+  const stamp = ms => {
+    if (!ms) return '';
+    const d = new Date(ms);
+    const p = n => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
+  };
+
+  // ── 상태 줄 ──
+  function setSync(kind, text, withRefresh) {
+    const line = $('syncLine');
+    line.className = 'sync-line ' + kind;
+    $('syncText').textContent = text;
+    let btn = line.querySelector('button');
+    if (withRefresh && !btn) {
+      btn = document.createElement('button');
+      btn.type = 'button';
+      btn.textContent = '지금 새로고침';
+      btn.addEventListener('click', refreshNow);
+      line.appendChild(btn);
+    } else if (!withRefresh && btn) btn.remove();
+  }
+
+  function errorText(err) {
+    const code = err && err.code;
+    switch (code) {
+      case 'needs_reauth': return 'Google Sheets 연결이 만료되었습니다. claude.ai 설정 → 커넥터에서 Google Sheets를 다시 연결해 주세요.';
+      case 'server_not_connected': return 'Google Sheets 커넥터가 연결되어 있지 않습니다. claude.ai 설정 → 커넥터에서 추가해 주세요.';
+      case 'selection_required': return 'Google Sheets 커넥터가 여러 개입니다. 화면 위 안내에서 사용할 계정을 선택해 주세요.';
+      case 'not_in_manifest': return '이 페이지에서 Google Sheets 사용이 허용되지 않았습니다. 페이지 권한 메뉴에서 허용하면 계산할 수 있습니다.';
+      case 'blocked_by_policy':
+      case 'approval_required': return '조직 정책으로 이 페이지에서 Google Sheets를 읽을 수 없습니다.';
+      case 'server_unavailable': return 'Google Sheets가 일시적으로 응답하지 않습니다. 잠시 후 새로고침해 주세요.';
+      case 'tool_error': return '시트를 읽지 못했습니다. 시트 접근 권한이나 탭 이름(Rate_by_age, Thresholds)을 확인해 주세요.';
+      case 'no_source': return '시트 연결 정보가 없습니다. 파일 안의 CSV_URLS에 웹에 게시한 CSV 링크를 넣어 주세요.';
+      case 'fetch_failed': return '게시된 CSV를 읽지 못했습니다. 웹 게시가 켜져 있는지, 링크가 맞는지 확인해 주세요.';
+      case 'not_granted':
+      case 'capability_disabled':
+      case 'capability_removed': return '이 화면에서는 스프레드시트 연동을 사용할 수 없습니다. claude.ai에서 로그인한 상태로 열어 주세요.';
+      default: return '시트를 불러오지 못했습니다' + (err && err.message ? ` (${err.message})` : '') + '. 새로고침해 주세요.';
+    }
+  }
+  const isDenial = c => ['no_source', 'needs_reauth', 'server_not_connected', 'not_in_manifest', 'blocked_by_policy', 'approval_required', 'not_granted', 'capability_disabled', 'capability_removed', 'consent_required', 'user_changed'].includes(c);
+
+  // ── 렌더 ──
+  function renderTable() {
+    const body = $('rateBody');
+    body.textContent = '';
+    if (!state.rates) {
+      const tr = document.createElement('tr');
+      const td = document.createElement('td');
+      td.colSpan = 7; td.className = 'rate-empty';
+      td.textContent = '스프레드시트 연결 후 연령별 평균 교정 속도가 여기에 표시됩니다.';
+      tr.appendChild(td); body.appendChild(tr);
+      return;
+    }
+    const pick = currentBin();
+    const rows = state.rates.bins.concat(state.rates.all ? [state.rates.all] : []);
+    rows.forEach(b => {
+      const tr = document.createElement('tr');
+      if (b === pick.bin) tr.className = 'is-bin';
+      if (b === state.rates.all) tr.className += ' is-all';
+      const cells = [b.label,
+        fmt(b.DD.n, 0), fmt(b.DD.rate), fmt(b.CVAI.n, 0), fmt(b.CVAI.rate), fmt(b.CI.n, 0), fmt(b.CI.rate)];
+      cells.forEach((c, i) => {
+        const td = document.createElement('td');
+        td.textContent = c;
+        if (i > 0 && c === '—') td.className = 'na';
+        tr.appendChild(td);
+      });
+      body.appendChild(tr);
+    });
+  }
+
+  function currentBin() {
+    const age = num($('pAge').value);
+    if (!state.rates || isNaN(age)) return { bin: null, age };
+    const bin = state.rates.bins.find(b => age >= b.lo && age < b.hi) || state.rates.all;
+    return { bin, age };
+  }
+
+  const UNITS = { DD: 'mm/월', CVAI: 'CVAI/월', CI: 'CI/월' };
+  const INPUT = { DD: 'pDD', CVAI: 'pCVAI', CI: 'pCI' };
+  const TILE = { DD: 'tDD', CVAI: 'tCVAI', CI: 'tCI' };
+
+  function setTile(key, cls, value, unit, sub) {
+    const el = $(TILE[key]);
+    el.className = 'pred-tile ' + cls;
+    const v = el.querySelector('.pt-value');
+    v.textContent = value;
+    if (unit) { const s = document.createElement('small'); s.textContent = unit; v.appendChild(s); }
+    el.querySelector('.pt-sub').textContent = sub || '';
+  }
+
+  function compute() {
+    const ready = state.rates && state.thr;
+    const { bin, age } = currentBin();
+
+    if (!ready) {
+      ['DD', 'CVAI', 'CI'].forEach(k => setTile(k, 't-empty', '—', '', state.error ? '시트 데이터가 필요합니다' : '불러오는 중…'));
+      $('predBin').textContent = state.error ? '스프레드시트에 연결되면 계산 결과가 표시됩니다.' : '시트 데이터를 불러오면 나이 구간과 근거 환아 수가 표시됩니다.';
+      renderTable();
+      return;
+    }
+
+    const binEl = $('predBin');
+    binEl.textContent = '';
+    if (isNaN(age)) {
+      binEl.textContent = '시작 나이를 입력하면 해당 나이 구간의 평균 속도로 계산합니다.';
+    } else {
+      binEl.append('시작 나이 ');
+      const s1 = document.createElement('strong'); s1.textContent = age + '개월'; binEl.append(s1);
+      binEl.append(' → ');
+      const s2 = document.createElement('strong'); s2.textContent = bin.label; binEl.append(s2);
+      binEl.append(' 구간 평균 속도 적용');
+      if (!isNaN(state.thr.minFu)) binEl.append(` · f/u ${state.thr.minFu}개월 이상 환아 기준`);
+    }
+
+    ['DD', 'CVAI', 'CI'].forEach(k => {
+      const start = num($(INPUT[k]).value);
+      const thr = state.thr[k];
+      if (isNaN(start)) { setTile(k, 't-empty', '—', '', '값을 입력하면 계산합니다'); return; }
+      if (isNaN(thr)) { setTile(k, 't-empty', '—', '', 'Thresholds 탭에 정상 기준값이 없습니다'); return; }
+      if (start <= thr) { setTile(k, 't-normal', '0', '개월', `이미 정상 범위 (기준 ${thr} 이하)`); return; }
+      if (isNaN(age) || !bin) { setTile(k, 't-empty', '—', '', '시작 나이를 입력해 주세요'); return; }
+
+      let src = bin, note = '';
+      if (!(src[k].rate > 0)) {
+        src = state.rates.all;
+        note = `${bin.label} 구간 자료가 없어 전체 평균 사용 · `;
+      }
+      if (!src || !(src[k].rate > 0)) { setTile(k, 't-empty', '—', '', '시트에 이 항목의 평균 속도가 아직 없습니다'); return; }
+
+      const months = (start - thr) / src[k].rate;
+      const cls = months <= 3 ? 't-short' : months <= 6 ? 't-mid' : 't-long';
+      const endAge = age + months;
+      const nTxt = isNaN(src[k].n) ? '' : ` · 근거 ${src[k].n}명`;
+      setTile(k, cls, months.toFixed(1), '개월',
+        `${note}${fmt(start, 1)} → ${thr} · 평균 ${fmt(src[k].rate)} ${UNITS[k]}${nTxt} · 종료 예상 약 ${Math.round(endAge)}개월`);
+    });
+    renderTable();
+  }
+
+  function updateSyncFromState() {
+    if (state.error && !(state.rates && state.thr)) { setSync('err', errorText(state.error), !isDenial(state.error.code)); return; }
+    if (state.rates && state.thr) {
+      const t = Math.min(state.storedAt.rate || Date.now(), state.storedAt.thr || Date.now());
+      const warn = state.error ? ' · 최근 갱신 실패, 마지막 값 표시 중' : '';
+      setSync('ok', `사두 시트 연동됨 · ${stamp(t)} 기준${warn}`, true);
+    }
+  }
+
+  // ── 연결 ──
+  function handlerFor(which) {
+    return ev => {
+      if (ev.type === 'data') {
+        const vals = valuesOf(ev.result);
+        if (!vals) { state.error = { code: 'tool_error', message: '응답 형식을 읽을 수 없음' }; }
+        else {
+          if (which === 'rate') state.rates = parseRates(vals); else state.thr = parseThr(vals);
+          state.storedAt[which] = (ev.result.cache && ev.result.cache.storedAt) || Date.now();
+          state.error = null;
+        }
+      } else if (ev.type === 'error') {
+        state.error = ev.error || { code: 'upstream_error' };
+        if (isDenial(state.error.code)) { state.rates = null; state.thr = null; }
+      }
+      updateSyncFromState();
+      compute();
+    };
+  }
+
+  function parseCsv(text) {
+    const rows = []; let row = [], cur = '', q = false;
+    for (let i = 0; i < text.length; i++) {
+      const c = text[i];
+      if (q) {
+        if (c === '"') { if (text[i + 1] === '"') { cur += '"'; i++; } else q = false; }
+        else cur += c;
+      } else if (c === '"') q = true;
+      else if (c === ',') { row.push(cur); cur = ''; }
+      else if (c === '\n' || c === '\r') {
+        if (c === '\r' && text[i + 1] === '\n') i++;
+        row.push(cur); rows.push(row); row = []; cur = '';
+      } else cur += c;
+    }
+    if (cur !== '' || row.length) { row.push(cur); rows.push(row); }
+    // 첫 빈 줄 전까지만 사용 (아래쪽 계산기 영역 제외)
+    const end = rows.findIndex((r, i) => i > 0 && r.every(v => String(v).trim() === ''));
+    return end === -1 ? rows : rows.slice(0, end);
+  }
+
+  async function loadCsv() {
+    try {
+      const bust = '&_=' + Date.now();
+      const [r, t] = await Promise.all([CSV_URLS.rate, CSV_URLS.thr].map(u =>
+        fetch(u + (u.includes('?') ? bust : '?' + bust.slice(1)), { cache: 'no-store' }).then(res => {
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          return res.text();
+        })));
+      state.rates = parseRates(parseCsv(r));
+      state.thr = parseThr(parseCsv(t));
+      state.storedAt.rate = state.storedAt.thr = Date.now();
+      state.error = null;
+    } catch (e) {
+      state.error = { code: 'fetch_failed', message: e && e.message };
+    }
+    updateSyncFromState(); compute();
+  }
+
+  async function refreshNow() {
+    if (csvMode) { setSync('loading', '시트를 다시 읽는 중…', false); return loadCsv(); }
+    if (!mcpRef) return;
+    setSync('loading', '시트를 다시 읽는 중…', false);
+    try { await mcpRef.invalidate(SERVER, 'get_values'); }
+    catch (e) { state.error = e; updateSyncFromState(); }
+  }
+
+  async function connect() {
+    let mcp = null;
+    try { mcp = window.claude && window.claude.use ? await window.claude.use('mcp') : null; } catch (e) { mcp = null; }
+    if (mcp) {
+      mcpRef = mcp;
+      const opts = { cache: { staleTime: 60000 }, refetchInterval: 300000 };
+      mcp.watchTool(SERVER, 'get_values', { spreadsheetId: SHEET_ID, range: RATE_RANGE }, handlerFor('rate'), opts);
+      mcp.watchTool(SERVER, 'get_values', { spreadsheetId: SHEET_ID, range: THR_RANGE }, handlerFor('thr'), opts);
+      return;
+    }
+    if (CSV_URLS.rate && CSV_URLS.thr) {
+      csvMode = true;
+      await loadCsv();
+      setInterval(() => { if (!document.hidden) loadCsv(); }, 300000);
+      return;
+    }
+    state.error = { code: window.claude ? 'not_granted' : 'no_source' };
+    updateSyncFromState(); compute();
+  }
+
+  // ── 입력 ──
+  ['pAge', 'pDD', 'pCVAI', 'pCI'].forEach(id => $(id).addEventListener('input', compute));
+  $('predForm').addEventListener('submit', e => e.preventDefault());
+  $('pClear').addEventListener('click', () => { ['pAge', 'pDD', 'pCVAI', 'pCI'].forEach(id => $(id).value = ''); compute(); });
+  $('pFromAbove').addEventListener('click', () => {
+    const a = parseFloat($('diagA').value), b = parseFloat($('diagB').value);
+    if (a > 0 && b > 0) {
+      const hi = Math.max(a, b), lo = Math.min(a, b);
+      $('pDD').value = (hi - lo).toFixed(1);
+      $('pCVAI').value = ((hi - lo) / hi * 100).toFixed(2);
+    }
+    const w = parseFloat($('mlDiam').value), l = parseFloat($('apDiam').value);
+    if (w > 0 && l > 0) $('pCI').value = (w / l * 100).toFixed(1);
+    compute();
+  });
+
+  compute();
+  connect();
+})();
+
 </script>
 </body>
 </html>
