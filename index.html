@@ -720,6 +720,9 @@ header {
 .rate-table td.na { color: var(--ink-faint); }
 .rate-empty { padding: 14px; text-align: center; color: var(--ink-faint); font-size: 0.7rem; }
 
+.pred-model { margin-top: 12px; font-size: 0.66rem; line-height: 1.6; color: var(--ink-light); background: var(--paper); border: 1px solid var(--warm); border-radius: 7px; padding: 8px 10px; }
+.pred-model strong { color: var(--ink); }
+
 @media (prefers-reduced-motion: reduce) { .card { animation: none; } }
 </style>
 </head>
@@ -1215,11 +1218,18 @@ header {
               <span class="field-unit">%</span>
             </div>
           </div>
+          <div class="field-group">
+            <div class="field-label"><div class="field-dot" style="background:var(--amber)"></div>시작 두위 (HC)</div>
+            <div class="field-row">
+              <input class="field-input" type="number" id="pHC" value="430" min="0" step="0.1" inputmode="decimal">
+              <span class="field-unit">mm</span>
+            </div>
+          </div>
           <div class="pred-actions">
             <button type="button" class="btn-soft" id="pFromAbove">위 계산 결과 가져오기</button>
             <button type="button" class="btn-soft" id="pClear">입력 지우기</button>
           </div>
-          <div class="pred-hint">해당 없는 항목은 비워 두세요. 처음 열면 예시 값(5개월 · DD 16 · CVAI 10 · CI 95)이 들어 있습니다. 미숙아는 교정 연령으로 입력하세요.</div>
+          <div class="pred-hint">해당 없는 항목은 비워 두세요. 처음 열면 예시 값(5개월 · DD 16 · CVAI 10 · CI 95 · 두위 430)이 들어 있습니다. 두위를 넣으면 시작값·나이·두위를 함께 반영한 보정값이, 비우면 나이 구간 평균값이 나옵니다. 미숙아는 교정 연령으로 입력하세요.</div>
         </form>
 
         <div style="min-width:0">
@@ -1235,6 +1245,8 @@ header {
         </div>
       </div>
 
+      <div class="pred-model" id="predModel">보정 모델은 시트에 회귀 결과가 생기면 표시됩니다.</div>
+
       <div class="rate-wrap">
         <table class="rate-table" id="rateTable">
           <thead>
@@ -1246,7 +1258,7 @@ header {
 
       <div class="formula-strip">
         <span class="f-label">계산식</span>
-        예상 개월 = (시작값 − 정상 기준) ÷ 해당 나이 구간 평균 교정 속도
+        예상 개월 = (시작값 − 정상 기준) ÷ 교정 속도 · 보정 속도 = 절편 + a×시작값 + b×나이 + c×두위
       </div>
       <div class="table-caption" id="predCaption">* 평균 속도는 f/u 기간이 최소 기준 이상인 환아만으로 계산되며, 변화가 일정하다고 가정한 추정치입니다. 실제로는 치료 후반에 교정 속도가 느려지는 경우가 많아 실제 기간이 더 길어질 수 있습니다. 근거 환아 수가 적은 구간은 해석에 주의하세요.</div>
     </div>
@@ -1453,6 +1465,7 @@ function resetCI() {
   const SHEET_ID = '1s2Hd14xLZoE39DfLqPvaGe8MN6sGq2z8Sh-eiiZ_4s4';
   const RATE_RANGE = 'Rate_by_age!A1:I6';
   const THR_RANGE = 'Thresholds!A1:C5';
+  const MODEL_RANGE = 'Rate_by_age!A23:K26';
 
   // ▼ GitHub Pages 등 claude.ai 밖에서 쓸 때: Google Sheets의
   //   아래 링크는 [파일 → 공유 → 웹에 게시]에서 Rate_by_age 탭과
@@ -1464,7 +1477,7 @@ function resetCI() {
   };
   const $ = id => document.getElementById(id);
 
-  const state = { rates: null, thr: null, storedAt: { rate: 0, thr: 0 }, error: null };
+  const state = { rates: null, thr: null, model: null, storedAt: { rate: 0, thr: 0 }, error: null };
   let mcpRef = null;
   let csvMode = false;
 
@@ -1494,6 +1507,21 @@ function resetCI() {
     const all = items.find(b => /전체/.test(b.label)) || items[items.length - 1] || null;
     const bins = items.filter(b => b !== all);
     return { bins, all };
+  }
+
+  function parseModel(values) {
+    // 헤더(항목, 절편, …) 다음 행들: DD / CVAI / CI
+    const h = values.findIndex(r => String(r[0] || '').trim() === '항목' && /절편/.test(String(r[1] || '')));
+    if (h === -1) return null;
+    const m = {};
+    values.slice(h + 1, h + 4).forEach(r => {
+      const k = String(r[0] || '').trim();
+      if (!['DD', 'CVAI', 'CI'].includes(k)) return;
+      const v = r.slice(1, 11).map(num);
+      if (v.slice(0, 4).some(isNaN)) return;
+      m[k] = { b0: v[0], a: v[1], bAge: v[2], cHC: v[3], r2: v[4], n: v[5], tStart: v[6], tAge: v[7], tHC: v[8], sd: v[9] };
+    });
+    return Object.keys(m).length ? m : null;
   }
 
   function parseThr(values) {
@@ -1642,13 +1670,43 @@ function resetCI() {
       if (!src || !(src[k].rate > 0)) { setTile(k, 't-empty', '—', '', '시트에 이 항목의 평균 속도가 아직 없습니다'); return; }
 
       const months = (start - thr) / src[k].rate;
+      const nTxt = isNaN(src[k].n) ? '' : ` · 근거 ${src[k].n}명`;
+      const hc = num($('pHC').value);
+      const md = state.model && state.model[k];
+      if (!isNaN(hc) && md) {
+        const spd = md.b0 + md.a * start + md.bAge * age + md.cHC * hc;
+        if (spd >= 0.1) {
+          const adj = (start - thr) / spd;
+          const cls = adj <= 3 ? 't-short' : adj <= 6 ? 't-mid' : 't-long';
+          setTile(k, cls, adj.toFixed(1), '개월',
+            `보정 · 예측 속도 ${fmt(spd)} ${UNITS[k]} (시작값·나이·두위 반영, ${md.n}명 회귀) · 나이 구간 평균만 쓰면 ${months.toFixed(1)}개월 · 종료 예상 약 ${Math.round(age + adj)}개월`);
+          return;
+        }
+        note += '보정 예측 속도가 너무 느려 나이 구간 평균으로 표시 · ';
+      }
       const cls = months <= 3 ? 't-short' : months <= 6 ? 't-mid' : 't-long';
       const endAge = age + months;
-      const nTxt = isNaN(src[k].n) ? '' : ` · 근거 ${src[k].n}명`;
+      const hint = isNaN(hc) ? ' · 두위를 넣으면 보정값으로 바뀝니다' : '';
       setTile(k, cls, months.toFixed(1), '개월',
-        `${note}${fmt(start, 1)} → ${thr} · 평균 ${fmt(src[k].rate)} ${UNITS[k]}${nTxt} · 종료 예상 약 ${Math.round(endAge)}개월`);
+        `${note}${fmt(start, 1)} → ${thr} · 나이 구간 평균 ${fmt(src[k].rate)} ${UNITS[k]}${nTxt} · 종료 예상 약 ${Math.round(endAge)}개월${hint}`);
     });
     renderTable();
+    renderModel();
+  }
+
+  function renderModel() {
+    const el = $('predModel');
+    el.textContent = '';
+    const m = state.model;
+    if (!m) { el.textContent = '보정 모델은 시트에 회귀 결과가 생기면 표시됩니다.'; return; }
+    const name = { DD: 'DD', CVAI: 'CVAI', CI: 'CI' };
+    const parts = ['DD', 'CVAI', 'CI'].filter(k => m[k]).map(k => {
+      const x = m[k];
+      const sig = Math.abs(x.tHC) >= 2 ? '의미 있음' : '뚜렷하지 않음';
+      return `${name[k]}: 두위 1 cm당 속도 ${x.cHC * 10 >= 0 ? '+' : ''}${(x.cHC * 10).toFixed(2)}/월 (t=${fmt(x.tHC)}, ${sig}) · 시작값 t=${fmt(x.tStart)} · R² ${fmt(x.r2)} · ${x.n}명`;
+    });
+    const t = document.createElement('strong'); t.textContent = '보정 모델 (우리 환아 자료로 자동 회귀): ';
+    el.append(t, parts.join('  |  '));
   }
 
   function updateSyncFromState() {
@@ -1667,13 +1725,15 @@ function resetCI() {
         const vals = valuesOf(ev.result);
         if (!vals) { state.error = { code: 'tool_error', message: '응답 형식을 읽을 수 없음' }; }
         else {
-          if (which === 'rate') state.rates = parseRates(vals); else state.thr = parseThr(vals);
+          if (which === 'rate') state.rates = parseRates(vals);
+          else if (which === 'model') state.model = parseModel(vals);
+          else state.thr = parseThr(vals);
           state.storedAt[which] = (ev.result.cache && ev.result.cache.storedAt) || Date.now();
           state.error = null;
         }
       } else if (ev.type === 'error') {
         state.error = ev.error || { code: 'upstream_error' };
-        if (isDenial(state.error.code)) { state.rates = null; state.thr = null; }
+        if (isDenial(state.error.code)) { state.rates = null; state.thr = null; state.model = null; }
       }
       updateSyncFromState();
       compute();
@@ -1695,7 +1755,11 @@ function resetCI() {
       } else cur += c;
     }
     if (cur !== '' || row.length) { row.push(cur); rows.push(row); }
-    // 첫 빈 줄 전까지만 사용 (아래쪽 계산기 영역 제외)
+    return rows;
+  }
+
+  // 첫 빈 줄 전까지만 (Rate_by_age 위쪽 표)
+  function firstBlock(rows) {
     const end = rows.findIndex((r, i) => i > 0 && r.every(v => String(v).trim() === ''));
     return end === -1 ? rows : rows.slice(0, end);
   }
@@ -1708,8 +1772,10 @@ function resetCI() {
           if (!res.ok) throw new Error('HTTP ' + res.status);
           return res.text();
         })));
-      state.rates = parseRates(parseCsv(r));
-      state.thr = parseThr(parseCsv(t));
+      const rr = parseCsv(r);
+      state.rates = parseRates(firstBlock(rr));
+      state.model = parseModel(rr);
+      state.thr = parseThr(firstBlock(parseCsv(t)));
       state.storedAt.rate = state.storedAt.thr = Date.now();
       state.error = null;
     } catch (e) {
@@ -1734,6 +1800,7 @@ function resetCI() {
       const opts = { cache: { staleTime: 60000 }, refetchInterval: 300000 };
       mcp.watchTool(SERVER, 'get_values', { spreadsheetId: SHEET_ID, range: RATE_RANGE }, handlerFor('rate'), opts);
       mcp.watchTool(SERVER, 'get_values', { spreadsheetId: SHEET_ID, range: THR_RANGE }, handlerFor('thr'), opts);
+      mcp.watchTool(SERVER, 'get_values', { spreadsheetId: SHEET_ID, range: MODEL_RANGE }, handlerFor('model'), opts);
       return;
     }
     if (CSV_URLS.rate && CSV_URLS.thr) {
@@ -1747,9 +1814,9 @@ function resetCI() {
   }
 
   // ── 입력 ──
-  ['pAge', 'pDD', 'pCVAI', 'pCI'].forEach(id => $(id).addEventListener('input', compute));
+  ['pAge', 'pDD', 'pCVAI', 'pCI', 'pHC'].forEach(id => $(id).addEventListener('input', compute));
   $('predForm').addEventListener('submit', e => e.preventDefault());
-  $('pClear').addEventListener('click', () => { ['pAge', 'pDD', 'pCVAI', 'pCI'].forEach(id => $(id).value = ''); compute(); });
+  $('pClear').addEventListener('click', () => { ['pAge', 'pDD', 'pCVAI', 'pCI', 'pHC'].forEach(id => $(id).value = ''); compute(); });
   $('pFromAbove').addEventListener('click', () => {
     const a = parseFloat($('diagA').value), b = parseFloat($('diagB').value);
     if (a > 0 && b > 0) {
